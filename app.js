@@ -2,6 +2,8 @@ const express = require('express')
 const mongoose = require('mongoose')
 const errorHandlerMiddleware = require('./middleware/error-handler')
 const notFoundMiddleware = require('./middleware/not-found')
+const authRoutes = require('./routes/authRoutes')
+const jobRoutes = require('./routes/jobRoutes')
 require('dotenv').config()
 
 const app = express()
@@ -10,6 +12,9 @@ app.get("/", (req, res) => {
     // throw new Error("error")
     res.send("Welcome to node.js!!")
 })
+
+app.use("/api/auth", authRoutes)
+app.use("/api/job", jobRoutes)
 
 app.use(notFoundMiddleware)
 app.use(errorHandlerMiddleware)

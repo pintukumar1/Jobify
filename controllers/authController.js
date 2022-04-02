@@ -1,13 +1,17 @@
-const register = (req, res) => {
-    console.log("register")
+const User = require('../models/user')
+const { StatusCodes } = require('http-status-codes')
+
+const register = async (req, res) => {
+    const user = await User.create(req.body)
+    res.status(StatusCodes.OK).json({ user })
 }
 
-const login = (req, res) => {
-    console.log("login")
+const login = async (req, res) => {
+    res.send("login")
 }
 
-const updateUser = (req, res) => {
-    console.log('Update user')
+const updateUser = async (req, res) => {
+    res.send('Update user')
 }
 
 exports.register = register

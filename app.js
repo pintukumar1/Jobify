@@ -1,19 +1,21 @@
 const express = require('express')
 const mongoose = require('mongoose')
-const errorHandlerMiddleware = require('./middleware/error-handler')
-const notFoundMiddleware = require('./middleware/not-found')
 const authRoutes = require('./routes/authRoutes')
 const jobRoutes = require('./routes/jobRoutes')
+const notFoundMiddleware = require('./middleware/not-found')
+const errorHandlerMiddleware = require('./middleware/error-handler')
 require('dotenv').config()
+require("express-async-errors");
 
 const app = express()
 
-app.get("/", (req, res) => {
-    // throw new Error("error")
-    res.send("Welcome to node.js!!")
+app.use(express.json())
+
+app.get('/', (req, res) => {
+    res.send("Welcome!!")
 })
 
-app.use("/api/auth", authRoutes)
+app.use("/api/auth", authRoutes);
 app.use("/api/job", jobRoutes)
 
 app.use(notFoundMiddleware)

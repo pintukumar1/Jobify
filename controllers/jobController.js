@@ -1,21 +1,22 @@
-const createJob = (req, res) => {
-    console.log("Create job")
+const createJob = async (req, res) => {
+    res.send.log("Create job")
 }
 
-const deleteJob = (req, res) => {
-    console.log("Delete job")
+const getAllJobs = async (req, res) => {
+    res.send.log("get all jobs")
 }
 
-const getAllJobs = (req, res) => {
-    console.log("get all jobs")
+const updateJob = async (req, res) => {
+    res.send.log("Update job")
 }
 
-const updateJob = (req, res) => {
-    console.log("Update job")
+const deleteJob = async (req, res) => {
+    res.send.log("Delete job")
 }
 
-const showStats = (req, res) => {
-    console.log("showStats")
+
+const showStats = async (req, res) => {
+    res.send.log("showStats")
 }
 
 exports.createJob = createJob

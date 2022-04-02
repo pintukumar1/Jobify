@@ -1,6 +1,13 @@
-const errorHandlerMiddleware = (error, req, res, next) => {
-    console.log(error)
-    res.status(500).json({message: "There was an error."})
+const { StatusCodes } = require("http-status-codes")
+
+const errorHandlerMiddleware = (err, req, res, next) => {
+    console.log(err)
+    const defaultError  = {
+        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        msg: "Something went wrong, try again later."
+    }
+    res.status(defaultError.statusCode).json({ msg: err })
 }
 
 module.exports = errorHandlerMiddleware
+

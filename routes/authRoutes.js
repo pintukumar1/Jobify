@@ -8,6 +8,6 @@ router.post("/register", authControllers.register)
 
 router.post("/login", authControllers.login)
 
-router.post("/updateuser", authControllers.updateUser)
+router.patch("/updateuser", authControllers.updateUser)
 
 module.exports = router

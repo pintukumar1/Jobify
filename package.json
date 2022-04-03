@@ -18,10 +18,12 @@
   },
   "homepage": "https://github.com/pintukumar1/Jobify#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.2",
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
     "http-status-codes": "^2.2.0",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.2.9",
     "validator": "^13.7.0"
   },

@@ -12,7 +12,7 @@ const initialState = {
 }
 const Register = () => {
     const navigate = useNavigate();
-    const { user, isLoading, showAlert, displayAlert, registerUser } = useAppContext()
+    const { user, isLoading, showAlert, displayAlert, registerUser, loginUser } = useAppContext()
     const [values, setValues] = useState(initialState)
 
     const toggleMember = () => {
@@ -35,7 +35,7 @@ const Register = () => {
         }
         const currentUser = { name, email, password }
         if (isMember) {
-            console.log("Already a member..");
+            loginUser(currentUser)
         } else {
             registerUser(currentUser)
         }
@@ -48,7 +48,7 @@ const Register = () => {
             }, 3000)
         }
     }, [user, navigate])
-    
+
     return (
         <Wrapper className="full-page">
             <form className="form" onSubmit={onSubmit}>

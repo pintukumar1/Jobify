@@ -5,7 +5,12 @@ import {
     DISPLAY_ALERT,
     REGISTER_USER_BEGIN,
     REGISTER_USER_ERROR,
-    REGISTER_USER_SUCCESS
+    REGISTER_USER_SUCCESS,
+    LOGIN_USER_BEGIN,
+    LOGIN_USER_SUCCESS,
+    LOGIN_USER_ERROR,
+    TOOGLE_SIDEBAR,
+    LOGOUT_USER
 } from "./actions";
 import reducer from "./reducer";
 
@@ -48,7 +53,7 @@ const AppProvider = ({ children }) => {
         localStorage.setItem("location", location)
     }
 
-    const removeItemFromLocalStorage = () => {
+    const removeUserFromLocalStorage = () => {
         localStorage.removeItem("user")
         localStorage.removeItem("token")
         localStorage.removeItem("location")
@@ -58,22 +63,45 @@ const AppProvider = ({ children }) => {
         dispatch({ type: REGISTER_USER_BEGIN })
         try {
             const response = await axios.post("http://localhost:5000/api/auth/register", currentUser)
-            console.log(response)
             const { user, token, location } = response.data
             dispatch({ type: REGISTER_USER_SUCCESS, payload: { user, token, location } })
             addUserToLocalStorage({ user, token, location })
         } catch (error) {
-            console.log(error.response)
             dispatch({ type: REGISTER_USER_ERROR, payload: { msg: error.response.data.msg } })
         }
         clearAlert()
+    }
+
+    const loginUser = async (currentUser) => {
+        dispatch({ type: LOGIN_USER_BEGIN })
+        try {
+            const response = await axios.post("http://localhost:5000/api/auth/login", currentUser)
+            const { user, token, location } = response.data
+            dispatch({ type: LOGIN_USER_SUCCESS, payload: { user, token, location } })
+            addUserToLocalStorage({ user, token, location })
+        } catch (error) {
+            dispatch({ type: LOGIN_USER_ERROR, payload: { msg: error.response.data.msg } })
+        }
+        clearAlert()
+    }
+
+    const toggleSidebar = () => {
+        dispatch({ type: TOOGLE_SIDEBAR })
+    }
+
+    const logoutUser = () => {
+        dispatch({type: LOGOUT_USER})
+        removeUserFromLocalStorage()
     }
 
     return (
         <AppContext.Provider value={{
             ...state,
             displayAlert,
-            registerUser
+            registerUser,
+            loginUser,
+            toggleSidebar,
+            logoutUser
         }}>
             {children}
         </AppContext.Provider>

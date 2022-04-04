@@ -4,11 +4,12 @@ const User = require('../models/user')
 const bcrypt = require('bcryptjs')
 const jwt = require("jsonwebtoken")
 require("dotenv").config();
-const { 
-    BadRequestError, 
-    NotFoundError, 
+
+const {
+    BadRequestError,
+    UnAuthenticatedError,
     InternalServerError
- } = require("../errors")
+} = require("../errors")
 
 const register = async (req, res, next) => {
     const { name, email, password } = req.body
@@ -54,8 +55,9 @@ const register = async (req, res, next) => {
 
     let token
     try {
-        token = jwt.sign({ 
-            userId: createdUser.id, email: createdUser.email },
+        token = jwt.sign({
+            userId: createdUser.id, email: createdUser.email
+        },
             process.env.JWT_KEY, { expiresIn: process.env.JWT_LIFETIME })
     } catch (err) {
         const error = new InternalServerError("Signing up failed, please try again.")
@@ -75,8 +77,64 @@ const register = async (req, res, next) => {
     })
 }
 
-const login = async (req, res) => {
-    res.send("login")
+
+const login = async (req, res, next) => {
+    const { email, password } = req.body
+
+    if (!email || !password) {
+        const error = new BadRequestError("Please provide all values..")
+        return next(error)
+    }
+
+    let existingUser
+    try {
+        existingUser = await User.findOne({ email: email })
+    }
+    catch (err) {
+        const error = new InternalServerError("Logging in failed, Please try again")
+        return next(error)
+    }
+
+    if (!existingUser) {
+        const error = new UnAuthenticatedError("Invalid credentials, user does not exist...")
+        return next(error)
+    }
+
+    let isMatch;
+    try {
+        isMatch = await bcrypt.compare(password, existingUser.password)
+    } catch (err) {
+        const error = new InternalServerError("Could not log you in, Please check your credentials and try again..")
+        return next(error)
+    }
+
+    if (!isMatch) {
+        const error = new UnAuthenticatedError("Invalid credentials, could not log you in... ")
+        return next(error)
+    }
+
+    let token;
+    try {
+        token = jwt.sign(
+            { userId: existingUser.id, email: existingUser.email },
+            process.env.JWT_KEY,
+            { expiresIn: process.env.JWT_LIFETIME })
+    } catch (err) {
+        const error = new InternalServerError("Logging in failed ,Please try again..")
+        return next(error)
+    }
+
+    res.status(StatusCodes.OK).json({
+        user: {
+            id: existingUser.id,
+            email: existingUser.email,
+            name: existingUser.name,
+            lastName: existingUser.lastName,
+            location: existingUser.location
+        },
+        location: existingUser.location,
+        token: token
+    })
 }
 
 const updateUser = async (req, res) => {

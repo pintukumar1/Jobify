@@ -97,7 +97,6 @@ const reducer = (state, action) => {
         return {
             ...state,
             showSidebar: !state.showSidebar
-
         }
     }
 

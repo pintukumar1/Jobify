@@ -23,6 +23,7 @@ const initialState = {
     showAlert: false,
     alertText: '',
     alertType: '',
+    showSidebar: false,
     user: user || null,
     token: token,
     userLocation: userLocation || "",

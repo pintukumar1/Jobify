@@ -7,6 +7,7 @@ const errorHandlerMiddleware = require('./middleware/error-handler')
 const cors = require("cors")
 const morgan = require("morgan")
 require('dotenv').config()
+const isAuth = require("./middleware/is-auth")
 
 const app = express()
 
@@ -22,7 +23,7 @@ app.get('/', (req, res) => {
 })
 
 app.use("/api/auth", authRoutes);
-app.use("/api/job", jobRoutes)
+app.use("/api/job", isAuth ,jobRoutes)
 
 app.use(notFoundMiddleware)
 app.use(errorHandlerMiddleware)

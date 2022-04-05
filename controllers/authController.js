@@ -1,5 +1,4 @@
 const { StatusCodes } = require('http-status-codes')
-// const BadRequestError = require("../errors/bad-request")
 const User = require('../models/user')
 const bcrypt = require('bcryptjs')
 const jwt = require("jsonwebtoken")
@@ -9,7 +8,7 @@ const {
     BadRequestError,
     UnAuthenticatedError,
     InternalServerError
-} = require("../errors")
+} = require("../errors");
 
 const register = async (req, res, next) => {
     const { name, email, password } = req.body
@@ -64,7 +63,7 @@ const register = async (req, res, next) => {
         return next(error)
     }
 
-    res.status(StatusCodes.OK).json({
+    res.status(StatusCodes.CREATED).json({
         user: {
             id: createdUser.id,
             name: createdUser.name,
@@ -124,7 +123,7 @@ const login = async (req, res, next) => {
         return next(error)
     }
 
-    res.status(StatusCodes.OK).json({
+    res.status(StatusCodes.CREATED).json({
         user: {
             id: existingUser.id,
             email: existingUser.email,
@@ -137,8 +136,38 @@ const login = async (req, res, next) => {
     })
 }
 
-const updateUser = async (req, res) => {
-    res.send('Update user')
+const updateUser = async (req, res, next) => {
+    const { email, name, lastName, location } = req.body
+    if (!email || !name || !lastName || !location) {
+        const error = new BadRequestError("Please provide all values...")
+        return next(error)
+    }
+
+    let user;
+    try {
+        user = await User.findById(req.user.userId)
+    } catch (err) {
+        const error = new InternalServerError("Updating user failed, please try again")
+        return next(error)
+    }
+
+    if(!user) {
+        const error = new UnAuthenticatedError("User not found with this user id")
+        return next(error)
+    }
+
+    user.email = email
+    user.name = name
+    user.lastName = lastName
+    user.location = location
+
+    try {
+        await user.save()
+    } catch (err) {
+        const error = new InternalServerError("Something went wrong, could not update place")
+        return next(error)
+    }
+    res.status(StatusCodes.OK).json({user:user})
 }
 
 exports.register = register

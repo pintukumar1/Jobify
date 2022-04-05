@@ -8,7 +8,7 @@ const FormRow = ({ type, name, value, handleChange, labelText }) => {
                 className="form-input"
                 type={type}
                 name={name}
-                value={value}
+                value={value || ""} 
                 onChange={handleChange} />
         </div>
     )

@@ -137,6 +137,7 @@ const login = async (req, res, next) => {
 }
 
 const updateUser = async (req, res, next) => {
+
     const { email, name, lastName, location } = req.body
     if (!email || !name || !lastName || !location) {
         const error = new BadRequestError("Please provide all values...")
@@ -151,7 +152,7 @@ const updateUser = async (req, res, next) => {
         return next(error)
     }
 
-    if(!user) {
+    if (!user) {
         const error = new UnAuthenticatedError("User not found with this user id")
         return next(error)
     }
@@ -167,7 +168,19 @@ const updateUser = async (req, res, next) => {
         const error = new InternalServerError("Something went wrong, could not update place")
         return next(error)
     }
-    res.status(StatusCodes.OK).json({user:user})
+
+    let token;
+    try {
+        token = jwt.sign(
+            { userId: user.id, email: user.email },
+            process.env.JWT_KEY,
+            { expiresIn: process.env.JWT_LIFETIME })
+    } catch (err) {
+        const error = new InternalServerError("updating user failed ,Please try again..")
+        return next(error)
+    }
+
+    res.status(StatusCodes.OK).json({ user: user, token: token })
 }
 
 exports.register = register

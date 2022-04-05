@@ -22,7 +22,7 @@ const Navbar = () => {
                 <div className="btn-container">
                     <button type="button" className="btn" onClick={() => setShowLogout(!showLogout)}>
                         <FaUserCircle />
-                        {user.name}
+                        {user?.name}
                         <FaCaretDown />
                     </button>
                     <div className={showLogout ? "dropdown show-dropdown" : "dropdown"}>

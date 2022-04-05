@@ -18,7 +18,7 @@ const Wrapper = styled.section`
     width: 100%;
   }
   .form-row {
-    margin-bottom: 0;
+    margin: 0 1rem;
   }
   .form-center {
     display: grid;

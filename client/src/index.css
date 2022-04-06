@@ -166,7 +166,7 @@ ul {
   background: var(--primary-700);
 }
 .btn-block {
-  width: 48%;
+  width: 100%;
 }
 .btn-hero {
   font-size: 1.25rem;

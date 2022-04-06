@@ -13,7 +13,9 @@ import {
     LOGOUT_USER,
     UPDATE_USER_BEGIN,
     UPDATE_USER_SUCCESS,
-    UPDATE_USER_ERROR
+    UPDATE_USER_ERROR,
+    HANDLE_CHANGE,
+    CLEAR_VALUES
 } from "./actions";
 import reducer from "./reducer";
 
@@ -26,11 +28,19 @@ const initialState = {
     showAlert: false,
     alertText: '',
     alertType: '',
-    showSidebar: false,
     user: user,
     token: token,
     userLocation: userLocation || "",
-    jobLocation: userLocation || ""
+    showSidebar: false,
+    isEditing: false,
+    editJobId: "",
+    position: "",
+    company: "",
+    jobLocation: userLocation || "",
+    jobTypeOptions: ["full-time", "part-time", "remote", "internship"],
+    jobType: "full-time",
+    statusOptions: ["interview", "declined", "pending"],
+    status: "pending"
 }
 
 const AppContext = React.createContext()
@@ -58,14 +68,14 @@ const AppProvider = ({ children }) => {
     // response
     authFetch.interceptors.response.use(
         (response) => {
-        return response
-    }, (error) => {
-        console.log(error.response)
-        if (error.response.status === 401) {
-            logoutUser()
-        }
-        return Promise.reject(error)
-    })
+            return response
+        }, (error) => {
+            console.log(error.response)
+            if (error.response.status === 401) {
+                logoutUser()
+            }
+            return Promise.reject(error)
+        })
 
     const displayAlert = () => {
         dispatch({ type: DISPLAY_ALERT })
@@ -143,6 +153,14 @@ const AppProvider = ({ children }) => {
         clearAlert()
     }
 
+    const handleChange = ({ name, value }) => {
+        dispatch({ type: HANDLE_CHANGE, payload: { name, value } })
+    }
+
+    const clearValues = () => {
+        dispatch({ type: CLEAR_VALUES })
+    }
+
     return (
         <AppContext.Provider value={{
             ...state,
@@ -151,7 +169,9 @@ const AppProvider = ({ children }) => {
             loginUser,
             toggleSidebar,
             logoutUser,
-            updateUser
+            updateUser,
+            handleChange,
+            clearValues
         }}>
             {children}
         </AppContext.Provider>

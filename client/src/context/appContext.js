@@ -1,4 +1,4 @@
-import React, { useReducer, useContext } from "react";
+import React, { useReducer, useContext, useEffect } from "react";
 import axios from "axios"
 import {
     CLEAR_ALERT,
@@ -18,7 +18,9 @@ import {
     CLEAR_VALUES,
     CREATE_JOB_BEGIN,
     CREATE_JOB_SUCCESS,
-    CREATE_JOB_ERROR
+    CREATE_JOB_ERROR,
+    GET_JOBS_BEGIN,
+    GET_JOBS_SUCCESS
 } from "./actions";
 import reducer from "./reducer";
 
@@ -43,7 +45,11 @@ const initialState = {
     jobTypeOptions: ["full-time", "part-time", "remote", "internship"],
     jobType: "full-time",
     statusOptions: ["interview", "declined", "pending"],
-    status: "pending"
+    status: "pending",
+    jobs: [],
+    totalJobs: 0,
+    numOfPages: 1,
+    page: 1
 }
 
 const AppContext = React.createContext()
@@ -57,7 +63,6 @@ const AppProvider = ({ children }) => {
     const authFetch = axios.create({
         baseURL: "http://localhost:5000/api",
     })
-
     //request
     authFetch.interceptors.request.use(
         (config) => {
@@ -67,7 +72,6 @@ const AppProvider = ({ children }) => {
         (error) => {
             return Promise.reject(error)
         })
-
     // response
     authFetch.interceptors.response.use(
         (response) => {
@@ -170,8 +174,8 @@ const AppProvider = ({ children }) => {
             const { position, company, jobLocation, jobType, status } = state
             await authFetch.post("/job",
                 {
-                    company,
                     position,
+                    company,
                     jobLocation,
                     jobType,
                     status
@@ -187,6 +191,21 @@ const AppProvider = ({ children }) => {
         }
         clearAlert()
     }
+
+    const getAllJobs = async () => {
+        let url = `/job`
+        dispatch({ type: GET_JOBS_BEGIN })
+        try {
+            const { data } = await authFetch(url)
+            console.log(data)
+            const { job, totalJobs, numOfPages } = data
+            dispatch({ type: GET_JOBS_SUCCESS, payload: { job, totalJobs, numOfPages } })
+        } catch (error) {
+            console.log(error.response)
+        }
+        clearAlert()
+    }
+
     return (
         <AppContext.Provider value={{
             ...state,
@@ -198,7 +217,8 @@ const AppProvider = ({ children }) => {
             updateUser,
             handleChange,
             clearValues,
-            createJob
+            createJob,
+            getAllJobs
         }}>
             {children}
         </AppContext.Provider>

@@ -12,7 +12,7 @@ const initialState = {
 }
 const Register = () => {
     const navigate = useNavigate();
-    const { user, isLoading, showAlert, displayAlert, registerUser, loginUser } = useAppContext()
+    const { user, isLoading, showAlert, registerUser, loginUser } = useAppContext()
     const [values, setValues] = useState(initialState)
 
     const toggleMember = () => {

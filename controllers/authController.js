@@ -152,11 +152,6 @@ const updateUser = async (req, res, next) => {
         return next(error)
     }
 
-    if (!user) {
-        const error = new UnAuthenticatedError("User not found with this user id")
-        return next(error)
-    }
-
     user.email = email
     user.name = name
     user.lastName = lastName

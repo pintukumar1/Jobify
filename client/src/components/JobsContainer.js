@@ -19,7 +19,7 @@ const SearchContainer = () => {
     if (jobs.length === 0) {
         return (
             <Wrapper>
-                <h2>No jobs to dispaly...</h2>
+                <h2>No jobs to display...</h2>
             </Wrapper>
         )
     }
@@ -30,7 +30,7 @@ const SearchContainer = () => {
             </h5>
             <div className="jobs">
                 {jobs.map((job) => {
-                    return <Job key={job.id} {...job} />
+                    return <Job key={job._id} {...job} />
                 })}
             </div>
             {/* pagination buttons */}

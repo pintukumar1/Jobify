@@ -1,10 +1,9 @@
 const { StatusCodes } = require("http-status-codes")
-const { BadRequestError, InternalServerError } = require("../errors")
-const { find } = require("../models/job")
+const { BadRequestError, InternalServerError, UnAuthenticatedError } = require("../errors")
 const Job = require("../models/job")
 
 const createJob = async (req, res, next) => {
-    const { company, position } = req.body
+    const { company, position, jobLocation, jobType, status } = req.body
     const createdBy = req.user.userId
 
     if (!company || !position) {
@@ -13,7 +12,7 @@ const createJob = async (req, res, next) => {
     }
 
     const job = new Job({
-        company, position, createdBy
+        company, position, createdBy, jobLocation, jobType, status
     })
 
     try {
@@ -36,12 +35,74 @@ const getAllJobs = async (req, res, next) => {
     res.status(StatusCodes.OK).json({ job: jobs, totalJobs: jobs.length, numOfPages: 1 })
 }
 
-const updateJob = async (req, res) => {
-    res.send.log("Update job")
+const updateJob = async (req, res, next) => {
+    const jobId = req.params.id
+    const { company, position } = req.body
+    if (!position || !company) {
+        const error = new BadRequestError("Please provide all values")
+        return next(error)
+    }
+
+    let job
+    try {
+        job = await Job.findById(jobId)
+    } catch (err) {
+        const error = new InternalServerError("job updation failed, Please try again..")
+        return next(error)
+    }
+
+    if (!job) {
+        const error = new BadRequestError("Job not found with this id.")
+        return next(error)
+    }
+
+    if (req.user.userId !== job.createdBy.toString()) {
+        const error = new UnAuthenticatedError("Not authorized to access this route..")
+        return next(error)
+    }
+
+    let updatedJob
+    try {
+        updatedJob = await Job.findOneAndUpdate({ _id: jobId }, req.body,
+            {
+                new: true,
+                runValidators: true
+            })
+    } catch (err) {
+        const error = new InternalServerError("job updation failed")
+        return next(error)
+    }
+    res.status(StatusCodes.OK).json({ job: updatedJob })
 }
 
-const deleteJob = async (req, res) => {
-    res.send.log("Delete job")
+const deleteJob = async (req, res, next) => {
+    const jobId = req.params.id
+    let job
+    try {
+        job = await Job.findById(jobId)
+    } catch (err) {
+        const error = new InternalServerError("could not delete this job..")
+        return next(error)
+    }
+
+    if (!job) {
+        const error = new BadRequestError("Job not found")
+        return next(error)
+    }
+
+    if (req.user.userId !== job.createdBy.toString()) {
+        const error = new UnAuthenticatedError("Not authorized to accesss this route.")
+        return next(error)
+    }
+
+    try {
+        await job.remove()
+    } catch (err) {
+        const error = new InternalServerError("Could not delete this post")
+        return next(error)
+    }
+
+    res.status(StatusCodes.OK).json({ msg: "job deleted Successfully" })
 }
 
 

@@ -1,11 +1,13 @@
 import React from 'react'
+import Wrapper from '../assets/wrappers/JobInfo'
 
-const SearchContainer = () => {
+const JobInfo = ({ icon, text }) => {
     return (
-        <div>
-            Job info
-        </div>
+        <Wrapper>
+            <span className="icon">{icon}</span>
+            <span className="text">{text}</span>
+        </Wrapper>
     )
 }
 
-export default SearchContainer
+export default JobInfo

@@ -1,11 +1,11 @@
 const express = require('express')
-const mongoose = require('mongoose')
 const authRoutes = require('./routes/authRoutes')
 const jobRoutes = require('./routes/jobRoutes')
 const notFoundMiddleware = require('./middleware/not-found')
 const errorHandlerMiddleware = require('./middleware/error-handler')
 const cors = require("cors")
 const morgan = require("morgan")
+const connectDB = require("./db/connect")
 require('dotenv').config()
 const isAuth = require("./middleware/is-auth")
 
@@ -32,7 +32,7 @@ const port = process.env.PORT || 5000
 
 const start = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URI)
+        await connectDB(process.env.MONGO_URI)
         console.log("MongoDB database connected...")
         app.listen(port, () => {
             console.log(`app is listening on port ${port}`)

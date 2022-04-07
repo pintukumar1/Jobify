@@ -7,7 +7,6 @@ const AddJob = () => {
     const {
         isEditing,
         showAlert,
-        displayAlert,
         position,
         company,
         jobLocation,
@@ -17,12 +16,15 @@ const AddJob = () => {
         statusOptions,
         handleChange,
         clearValues,
-        createJob
+        createJob,
+        editJob
     } = useAppContext()
 
     const handleSubmit = (event) => {
         event.preventDefault()
+        
         if(isEditing) {
+            editJob()
             return
         }
         createJob()

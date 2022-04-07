@@ -1,7 +1,7 @@
-const express = require('express')
+import express from "express"
+import authControllers from "../controllers/authController.js"
+import isAuth from "../middleware/is-auth.js"
 
-const authControllers = require('../controllers/authController')
-const isAuth = require("../middleware/is-auth")
 const router = express.Router()
 
 router.post("/register", authControllers.register)
@@ -10,4 +10,4 @@ router.post("/login", authControllers.login)
 
 router.patch("/updateuser",isAuth, authControllers.updateUser)
 
-module.exports = router
+export default router

@@ -1,6 +1,8 @@
-const jwt = require("jsonwebtoken")
-const { UnAuthenticatedError } = require("../errors");
-require("dotenv").config()
+import jwt from "jsonwebtoken"
+import UnAuthenticatedError from "../errors/un-authenticated.js"
+import dotenv from "dotenv"
+dotenv.config()
+
 
 const isAuth = (req, res, next) => {
     const authHeader = req.headers.authorization
@@ -21,4 +23,4 @@ const isAuth = (req, res, next) => {
     }
 }
 
-module.exports = isAuth
+export default isAuth

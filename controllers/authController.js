@@ -1,14 +1,12 @@
-const { StatusCodes } = require('http-status-codes')
-const User = require('../models/user')
-const bcrypt = require('bcryptjs')
-const jwt = require("jsonwebtoken")
-require("dotenv").config();
-
-const {
-    BadRequestError,
-    UnAuthenticatedError,
-    InternalServerError
-} = require("../errors");
+import { StatusCodes } from 'http-status-codes';
+import User from '../models/user.js';
+import bcrypt from 'bcryptjs'
+import jwt from 'jsonwebtoken'
+import dotenv from "dotenv"
+dotenv.config()
+import BadRequestError from '../errors/bad-request.js';
+import InternalServerError from '../errors/internal-server-error.js';
+import UnAuthenticatedError from '../errors/un-authenticated.js';
 
 const register = async (req, res, next) => {
     const { name, email, password } = req.body
@@ -178,6 +176,4 @@ const updateUser = async (req, res, next) => {
     res.status(StatusCodes.OK).json({ user: user, token: token })
 }
 
-exports.register = register
-exports.login = login
-exports.updateUser = updateUser
+export default { register, login, updateUser}

@@ -1,13 +1,14 @@
-const express = require('express')
-const authRoutes = require('./routes/authRoutes')
-const jobRoutes = require('./routes/jobRoutes')
-const notFoundMiddleware = require('./middleware/not-found')
-const errorHandlerMiddleware = require('./middleware/error-handler')
-const cors = require("cors")
-const morgan = require("morgan")
-const connectDB = require("./db/connect")
-require('dotenv').config()
-const isAuth = require("./middleware/is-auth")
+import express from "express"
+import authRoutes from "./routes/authRoutes.js"
+import jobRoutes from "./routes/jobRoutes.js"
+import notFoundMiddleware from "./middleware/not-found.js"
+import errorHandlerMiddleware from "./middleware/error-handler.js"
+import cors from "cors"
+import morgan from "morgan"
+import connectDB from "./db/connect.js"
+import dotenv from "dotenv"
+dotenv.config()
+import isAuth from "./middleware/is-auth.js"
 
 const app = express()
 

@@ -1,6 +1,9 @@
-const { StatusCodes } = require("http-status-codes")
-const { BadRequestError, InternalServerError, UnAuthenticatedError } = require("../errors")
-const Job = require("../models/job")
+import { StatusCodes } from "http-status-codes"
+import mongoose from "mongoose"
+import Job from "../models/job.js"
+import BadRequestError from "../errors/bad-request.js"
+import InternalServerError from "../errors/internal-server-error.js"
+import UnAuthenticatedError from "../errors/un-authenticated.js"
 
 const createJob = async (req, res, next) => {
     const { company, position, jobLocation, jobType, status } = req.body
@@ -107,11 +110,38 @@ const deleteJob = async (req, res, next) => {
 
 
 const showStats = async (req, res) => {
-    res.send.log("showStats")
+    let stats
+    stats = await Job.aggregate([
+        { $match: { createdBy: mongoose.Types.ObjectId(req.user.userId) } },
+        { $group: { _id: "$status", count: { $sum: 1 } } }
+    ])
+    console.log(stats)
+
+    stats = stats.reduce((acc, curr) => {
+        const { _id: title, count } = curr
+        acc[title] = count
+        return acc
+    }, {})
+    console.log(stats)
+
+    const defaultStats = {
+        pending: stats.pending || 0,
+        interview: stats.interview || 0,
+        declined: stats.declined || 0
+    }
+
+    let monthlyApplications = await Job.aggregate([
+        { $match: { createdBy: mongoose.Types.ObjectId(req.user.userId) } },
+        {
+            $group: {
+                _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+                count: { $sum: 1 }
+            },
+        },
+        { $sort: { "_id.year": -1, "_id.month": -1 } },
+        { $limit: 6 }
+    ])
+    res.status(StatusCodes.OK).json({ defaultStats, monthlyApplications })
 }
 
-exports.createJob = createJob
-exports.deleteJob = deleteJob
-exports.getAllJobs = getAllJobs
-exports.updateJob = updateJob
-exports.showStats = showStats
+export default {createJob, deleteJob, getAllJobs, updateJob, showStats}

@@ -4,6 +4,7 @@ import Job from "../models/job.js"
 import BadRequestError from "../errors/bad-request.js"
 import InternalServerError from "../errors/internal-server-error.js"
 import UnAuthenticatedError from "../errors/un-authenticated.js"
+import moment from "moment"
 
 const createJob = async (req, res, next) => {
     const { company, position, jobLocation, jobType, status } = req.body
@@ -115,14 +116,12 @@ const showStats = async (req, res) => {
         { $match: { createdBy: mongoose.Types.ObjectId(req.user.userId) } },
         { $group: { _id: "$status", count: { $sum: 1 } } }
     ])
-    console.log(stats)
 
     stats = stats.reduce((acc, curr) => {
         const { _id: title, count } = curr
         acc[title] = count
         return acc
     }, {})
-    console.log(stats)
 
     const defaultStats = {
         pending: stats.pending || 0,
@@ -139,8 +138,21 @@ const showStats = async (req, res) => {
             },
         },
         { $sort: { "_id.year": -1, "_id.month": -1 } },
-        { $limit: 6 }
+        { $limit: 6 },
     ])
+
+    monthlyApplications = monthlyApplications.map((item) => {
+        const {
+            _id: {year, month}, count
+        } = item
+        const date = moment()
+        .month(month - 1)
+        .year(year)
+        .format("MMM Y")
+        return {date, count}
+    })
+    .reverse()
+
     res.status(StatusCodes.OK).json({ defaultStats, monthlyApplications })
 }
 

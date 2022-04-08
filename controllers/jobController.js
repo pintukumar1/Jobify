@@ -44,6 +44,7 @@ const getAllJobs = async (req, res, next) => {
     if (search) {
         queryObject.position = { $regex: search, $options: "i" }
     }
+
     let result = Job.find(queryObject)
 
     if (sort === "latest") {
@@ -59,14 +60,22 @@ const getAllJobs = async (req, res, next) => {
         result = result.sort("-position")
     }
 
-    let jobs
+    const page = Number(req.query.page) || 1
+    const limit = Number(req.query.limit) || 10
+    const skip = (page - 1) * limit
+
+    result = result.skip(skip).limit(limit)
+
+    let jobs, totalJobs, numOfPages
     try {
         jobs = await result
+        totalJobs = await Job.countDocuments(queryObject)
+        numOfPages = Math.ceil(totalJobs / limit)
     } catch (err) {
         const error = new InternalServerError("Unable to fetch jobs, please try again.")
         return next(error)
     }
-    res.status(StatusCodes.OK).json({ job: jobs, totalJobs: jobs.length, numOfPages: 1 })
+    res.status(StatusCodes.OK).json({ job: jobs, totalJobs, numOfPages })
 }
 
 const updateJob = async (req, res, next) => {

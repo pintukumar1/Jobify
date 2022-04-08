@@ -28,7 +28,8 @@ import {
     EDIT_JOB_SUCCESS,
     SHOW_STATS_BEGIN,
     SHOW_STATS_SUCCESS,
-    CLEAR_FILTERS
+    CLEAR_FILTERS,
+    CHANGE_PAGE
 } from "./actions";
 import reducer from "./reducer";
 
@@ -76,7 +77,7 @@ const AppProvider = ({ children }) => {
     // axios.defaults.headers.common["Authorization"] = `Bearer ${state.token}` 
 
     const authFetch = axios.create({
-        baseURL: "http://localhost:5000/api",
+        baseURL: "/api",
     })
     //request
     authFetch.interceptors.request.use(
@@ -92,7 +93,6 @@ const AppProvider = ({ children }) => {
         (response) => {
             return response
         }, (error) => {
-            console.log(error.response)
             if (error.response.status === 401) {
                 logoutUser()
             }
@@ -127,7 +127,7 @@ const AppProvider = ({ children }) => {
     const registerUser = async (currentUser) => {
         dispatch({ type: REGISTER_USER_BEGIN })
         try {
-            const response = await axios.post("http://localhost:5000/api/auth/register", currentUser)
+            const response = await axios.post("/api/auth/register", currentUser)
             const { user, token, location } = response.data
             dispatch({ type: REGISTER_USER_SUCCESS, payload: { user, token, location } })
             addUserToLocalStorage({ user, token, location })
@@ -140,7 +140,7 @@ const AppProvider = ({ children }) => {
     const loginUser = async (currentUser) => {
         dispatch({ type: LOGIN_USER_BEGIN })
         try {
-            const response = await axios.post("http://localhost:5000/api/auth/login", currentUser)
+            const response = await axios.post("/api/auth/login", currentUser)
             const { user, token, location } = response.data
             dispatch({ type: LOGIN_USER_SUCCESS, payload: { user, token, location } })
             addUserToLocalStorage({ user, token, location })
@@ -208,8 +208,8 @@ const AppProvider = ({ children }) => {
     }
 
     const getAllJobs = async () => {
-        const { search, searchStatus, searchType, sort } = state
-        let url = `/job?status=${searchStatus}&jobType=${searchType}&sort=${sort}`
+        const { page, search, searchStatus, searchType, sort } = state
+        let url = `/job?page=${page}&status=${searchStatus}&jobType=${searchType}&sort=${sort}`
         if (search) {
             url = url + `&search=${search}`
         }
@@ -220,7 +220,7 @@ const AppProvider = ({ children }) => {
             const { job, totalJobs, numOfPages } = data
             dispatch({ type: GET_JOBS_SUCCESS, payload: { job, totalJobs, numOfPages } })
         } catch (error) {
-            console.log(error.response)
+            logoutUser()
         }
         clearAlert()
     }
@@ -250,7 +250,7 @@ const AppProvider = ({ children }) => {
             await authFetch.delete(`/job/${jobId}`)
             getAllJobs()
         } catch (err) {
-            console.log(err.response)
+            logoutUser() 
         }
     }
 
@@ -266,13 +266,16 @@ const AppProvider = ({ children }) => {
             })
         }
         catch (error) {
-            console.log(error.response)
-            // logoutUser()
+            logoutUser()
         }
     }
 
     const clearFilters = () => {
         dispatch({ type: CLEAR_FILTERS })
+    }
+
+    const changePage = (page) => {
+        dispatch({ type: CHANGE_PAGE, payload: { page } })
     }
 
     return (
@@ -292,7 +295,8 @@ const AppProvider = ({ children }) => {
             editJob,
             deleteJob,
             showStats,
-            clearFilters
+            clearFilters,
+            changePage
         }}>
             {children}
         </AppContext.Provider>

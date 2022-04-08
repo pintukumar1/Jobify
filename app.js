@@ -16,7 +16,6 @@ import helmet from "helmet"
 import xss from "xss-clean"
 import mongoSanitize from "express-mongo-sanitize"
 
-
 const app = express()
 
 if(process.env.NODE_ENV !== "production"){
@@ -34,12 +33,12 @@ app.use(mongoSanitize())
 
 app.use(cors())
 
+app.use("/api/auth", authRoutes);
+app.use("/api/job", isAuth ,jobRoutes)
+
 app.get("*", (req, res) => {
     res.sendFile(path.resolve(__dirname, "./client/build", "index.html"))
 })
-
-app.use("/api/auth", authRoutes);
-app.use("/api/job", isAuth ,jobRoutes)
 
 app.use(notFoundMiddleware)
 app.use(errorHandlerMiddleware)
@@ -50,9 +49,7 @@ const start = async () => {
     try {
         await connectDB(process.env.MONGO_URI)
         app.listen(port)
-    } catch (error) {
-        console.log(error)
-    }
+    } catch (error) {}
 }
 
 start();

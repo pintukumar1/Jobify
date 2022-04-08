@@ -60,7 +60,7 @@ const initialState = {
     numOfPages: 1,
     page: 1,
     stats: {},
-    monthlyApplications: [],
+    monthlyApplications: [] ,
     search: "",
     searchStatus: "all",
     searchType: "all",
@@ -258,6 +258,7 @@ const AppProvider = ({ children }) => {
         dispatch({ type: SHOW_STATS_BEGIN })
         try {
             const { data } = await authFetch("/job/stats")
+            
             dispatch({
                 type: SHOW_STATS_SUCCESS, payload: {
                     stats: data.defaultStats,
@@ -266,7 +267,8 @@ const AppProvider = ({ children }) => {
             })
         }
         catch (error) {
-            logoutUser()
+            // logoutUser()
+            console.log(error)
         }
     }
 

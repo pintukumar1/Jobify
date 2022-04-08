@@ -5,11 +5,11 @@ import { useAppContext } from '../context/appContext'
 import Job from './Job'
 
 const SearchContainer = () => {
-    const { jobs, getAllJobs, isLoading, page, totalJobs } = useAppContext()
+    const { jobs, getAllJobs, isLoading, page, totalJobs, search, searchStatus, searchType, sort } = useAppContext()
 
     useEffect(() => {
         getAllJobs()
-    }, [])
+    }, [search, searchStatus, searchType, sort])
 
 
     if (isLoading) {

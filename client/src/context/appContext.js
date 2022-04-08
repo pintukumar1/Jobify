@@ -27,7 +27,8 @@ import {
     EDIT_JOB_ERROR,
     EDIT_JOB_SUCCESS,
     SHOW_STATS_BEGIN,
-    SHOW_STATS_SUCCESS
+    SHOW_STATS_SUCCESS,
+    CLEAR_FILTERS
 } from "./actions";
 import reducer from "./reducer";
 
@@ -58,7 +59,12 @@ const initialState = {
     numOfPages: 1,
     page: 1,
     stats: {},
-    monthlyApplications: []
+    monthlyApplications: [],
+    search: "",
+    searchStatus: "all",
+    searchType: "all",
+    sort: "latest",
+    sortOptions: ["latest", "oldest", "a-z", "z-a"]
 }
 
 const AppContext = React.createContext()
@@ -202,7 +208,12 @@ const AppProvider = ({ children }) => {
     }
 
     const getAllJobs = async () => {
-        let url = `/job`
+        const { search, searchStatus, searchType, sort } = state
+        let url = `/job?status=${searchStatus}&jobType=${searchType}&sort=${sort}`
+        if (search) {
+            url = url + `&search=${search}`
+        }
+
         dispatch({ type: GET_JOBS_BEGIN })
         try {
             const { data } = await authFetch(url)
@@ -247,14 +258,21 @@ const AppProvider = ({ children }) => {
         dispatch({ type: SHOW_STATS_BEGIN })
         try {
             const { data } = await authFetch("/job/stats")
-            dispatch({ type: SHOW_STATS_SUCCESS, payload: { 
-                stats: data.defaultStats, 
-                monthlyApplications: data.monthlyApplications } })
+            dispatch({
+                type: SHOW_STATS_SUCCESS, payload: {
+                    stats: data.defaultStats,
+                    monthlyApplications: data.monthlyApplications
+                }
+            })
         }
         catch (error) {
             console.log(error.response)
             // logoutUser()
         }
+    }
+
+    const clearFilters = () => {
+        dispatch({ type: CLEAR_FILTERS })
     }
 
     return (
@@ -273,7 +291,8 @@ const AppProvider = ({ children }) => {
             setEditJob,
             editJob,
             deleteJob,
-            showStats
+            showStats,
+            clearFilters
         }}>
             {children}
         </AppContext.Provider>

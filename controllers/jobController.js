@@ -29,9 +29,39 @@ const createJob = async (req, res, next) => {
 }
 
 const getAllJobs = async (req, res, next) => {
+    const { status, jobType, sort, search } = req.query
+
+    const queryObject = {
+        createdBy: req.user.userId
+    }
+
+    if (status && status !== "all") {
+        queryObject.status = status
+    }
+    if (jobType && jobType !== "all") {
+        queryObject.jobType = jobType
+    }
+    if (search) {
+        queryObject.position = { $regex: search, $options: "i" }
+    }
+    let result = Job.find(queryObject)
+
+    if (sort === "latest") {
+        result = result.sort("-createdAt")
+    }
+    if (sort === "oldest") {
+        result = result.sort("createdAt")
+    }
+    if (sort === "a-z") {
+        result = result.sort("position")
+    }
+    if (sort === "z-a") {
+        result = result.sort("-position")
+    }
+
     let jobs
     try {
-        jobs = await Job.find({ createdBy: req.user.userId })
+        jobs = await result
     } catch (err) {
         const error = new InternalServerError("Unable to fetch jobs, please try again.")
         return next(error)
@@ -143,17 +173,17 @@ const showStats = async (req, res) => {
 
     monthlyApplications = monthlyApplications.map((item) => {
         const {
-            _id: {year, month}, count
+            _id: { year, month }, count
         } = item
         const date = moment()
-        .month(month - 1)
-        .year(year)
-        .format("MMM Y")
-        return {date, count}
+            .month(month - 1)
+            .year(year)
+            .format("MMM Y")
+        return { date, count }
     })
-    .reverse()
+        .reverse()
 
     res.status(StatusCodes.OK).json({ defaultStats, monthlyApplications })
 }
 
-export default {createJob, deleteJob, getAllJobs, updateJob, showStats}
+export default { createJob, deleteJob, getAllJobs, updateJob, showStats }

@@ -4,7 +4,6 @@ import { StatsContainer, Loading, ChartsContainer } from '../../components'
 
 const Stats = () => {
     const { isLoading, showStats, monthlyApplications } = useAppContext()
-    console.log(monthlyApplications)
     
     useEffect(() => {
         showStats()

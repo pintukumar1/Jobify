@@ -267,8 +267,7 @@ const AppProvider = ({ children }) => {
             })
         }
         catch (error) {
-            // logoutUser()
-            console.log(error)
+            logoutUser()
         }
     }
 

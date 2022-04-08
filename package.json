@@ -11,17 +11,9 @@
     "client-install": "cd client and npm install",
     "heroku-postbuild": "npm run client-install && npm run client-build"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/pintukumar1/Jobify.git"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/pintukumar1/Jobify/issues"
-  },
-  "homepage": "https://github.com/pintukumar1/Jobify#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.2",
